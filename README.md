@@ -63,6 +63,13 @@ By default, browser state files are saved to `~/.local/mcp/share/` directory. Yo
 STORAGE_STATE_PATH=/custom/path npx -y g-search-mcp
 ```
 
+The path supports `~` and `$HOME` expansion:
+
+```bash
+STORAGE_STATE_PATH=~/.local/mcp/share npx -y g-search-mcp
+STORAGE_STATE_PATH=$HOME/.local/mcp/share npx -y g-search-mcp
+```
+
 The directory will be created automatically if it doesn't exist. This is useful for:
 - Organizing state files in a specific location
 - Sharing state files across different environments
@@ -115,7 +122,7 @@ To use a custom storage state directory in MCP configuration:
       "command": "npx",
       "args": ["-y", "g-search-mcp"],
       "env": {
-        "STORAGE_STATE_PATH": "/home/core/.local/mcp/share"
+        "STORAGE_STATE_PATH": "~/.local/mcp/share"
       }
     }
   }
@@ -132,7 +139,7 @@ To use a custom storage state directory in MCP configuration:
       "args": ["-y", "g-search-mcp"],
       "env": {
         "CHROMIUM_EXECUTABLE_PATH": "/usr/bin/chromium",
-        "STORAGE_STATE_PATH": "/home/core/.local/mcp/share"
+        "STORAGE_STATE_PATH": "~/.local/mcp/share"
       }
     }
   }
