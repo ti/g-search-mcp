@@ -18,6 +18,7 @@ A powerful MCP server for Google search that enables parallel searching with mul
 - **User Behavior Simulation**: Simulates real user browsing patterns to reduce the possibility of detection by search engines
 - **Structured Data**: Returns structured search results in JSON format for easy processing and analysis
 - **Configurable Parameters**: Supports various parameter configurations such as search result limits, timeout settings, locale settings, etc.
+- **Custom Chromium Path**: Supports specifying custom Chromium executable path via environment variable
 
 ## Quick Start
 
@@ -41,6 +42,32 @@ Use the `--debug` option to run in debug mode (showing browser window):
 npx -y g-search-mcp --debug
 ```
 
+### Custom Chromium Path
+
+You can specify a custom Chromium executable path using the `CHROMIUM_EXECUTABLE_PATH` environment variable:
+
+```bash
+CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npx -y g-search-mcp
+```
+
+This is useful when:
+- You have Chromium installed in a non-standard location
+- You want to use a specific version of Chromium
+- You're running in a containerized environment with a custom Chromium installation
+
+### Storage State Configuration
+
+By default, browser state files are saved to `~/.local/mcp/share/` directory. You can customize this location using the `STORAGE_STATE_PATH` environment variable:
+
+```bash
+STORAGE_STATE_PATH=/custom/path npx -y g-search-mcp
+```
+
+The directory will be created automatically if it doesn't exist. This is useful for:
+- Organizing state files in a specific location
+- Sharing state files across different environments
+- Managing storage in containerized deployments
+
 ## Configure MCP
 
 Configure this MCP server in Claude Desktop:
@@ -54,6 +81,59 @@ Windows: `%APPDATA%/Claude/claude_desktop_config.json`
     "g-search": {
       "command": "npx",
       "args": ["-y", "g-search-mcp"]
+    }
+  }
+}
+```
+
+### With Custom Chromium Path
+
+To use a custom Chromium path in MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "g-search": {
+      "command": "npx",
+      "args": ["-y", "g-search-mcp"],
+      "env": {
+        "CHROMIUM_EXECUTABLE_PATH": "/usr/bin/chromium"
+      }
+    }
+  }
+}
+```
+
+### With Custom Storage State Path
+
+To use a custom storage state directory in MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "g-search": {
+      "command": "npx",
+      "args": ["-y", "g-search-mcp"],
+      "env": {
+        "STORAGE_STATE_PATH": "/home/core/.local/mcp/share"
+      }
+    }
+  }
+}
+```
+
+### With Both Custom Chromium Path and Storage State Path
+
+```json
+{
+  "mcpServers": {
+    "g-search": {
+      "command": "npx",
+      "args": ["-y", "g-search-mcp"],
+      "env": {
+        "CHROMIUM_EXECUTABLE_PATH": "/usr/bin/chromium",
+        "STORAGE_STATE_PATH": "/home/core/.local/mcp/share"
+      }
     }
   }
 }

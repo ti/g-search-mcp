@@ -1,6 +1,8 @@
 import { chromium, devices, BrowserContextOptions, Browser } from "playwright";
 import { SearchResponse, SearchResult, SearchOptions } from "../types/index.js";
 import { logger } from "../utils/logger.js";
+import { getChromiumLaunchOptions } from "../utils/chromiumConfig.js";
+import { getStateFilePath } from "../utils/storageConfig.js";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -112,7 +114,7 @@ export async function googleSearch(
   const {
     limit = 10,
     timeout = 60000,
-    stateFile = "./browser-state.json",
+    stateFile = getStateFilePath("browser-state.json"),
     noSaveState = false,
     locale = "en-US", // Default to English
   } = options;
@@ -215,7 +217,7 @@ export async function googleSearch(
       );
 
       // Initialize browser with more parameters to avoid detection
-      browser = await chromium.launch({
+      browser = await chromium.launch(getChromiumLaunchOptions({
         headless,
         timeout: timeout * 2, // Increase browser launch timeout
         args: [
@@ -246,7 +248,7 @@ export async function googleSearch(
           "--metrics-recording-only",
         ],
         ignoreDefaultArgs: ["--enable-automation"],
-      });
+      }));
 
       logger.info("[GoogleSearch] Browser launched successfully!");
     }
@@ -418,7 +420,7 @@ export async function googleSearch(
               "[GoogleSearch] CAPTCHA detected with external browser instance, creating new browser instance..."
             );
             // Create a new browser instance, no longer use the externally provided one
-            const newBrowser = await chromium.launch({
+            const newBrowser = await chromium.launch(getChromiumLaunchOptions({
               headless: false, // Use non-headless mode
               timeout: timeout * 2,
               args: [
@@ -450,7 +452,7 @@ export async function googleSearch(
                 "--metrics-recording-only",
               ],
               ignoreDefaultArgs: ["--enable-automation"],
-            });
+            }));
 
             // Use new browser instance to perform search
             try {
@@ -554,7 +556,7 @@ export async function googleSearch(
               "[GoogleSearch] CAPTCHA detected after search with external browser instance, creating new browser instance..."
             );
             // Create a new browser instance, no longer use the externally provided one
-            const newBrowser = await chromium.launch({
+            const newBrowser = await chromium.launch(getChromiumLaunchOptions({
               headless: false, // Use non-headless mode
               timeout: timeout * 2,
               args: [
@@ -586,7 +588,7 @@ export async function googleSearch(
                 "--metrics-recording-only",
               ],
               ignoreDefaultArgs: ["--enable-automation"],
-            });
+            }));
 
             // Use new browser instance to perform search
             try {
@@ -675,7 +677,7 @@ export async function googleSearch(
                 "[GoogleSearch] CAPTCHA detected while waiting for results with external browser instance, creating new browser instance..."
               );
               // Create a new browser instance, no longer use the externally provided one
-              const newBrowser = await chromium.launch({
+              const newBrowser = await chromium.launch(getChromiumLaunchOptions({
                 headless: false, // Use non-headless mode
                 timeout: timeout * 2,
                 args: [
@@ -707,7 +709,7 @@ export async function googleSearch(
                   "--metrics-recording-only",
                 ],
                 ignoreDefaultArgs: ["--enable-automation"],
-              });
+              }));
 
               // Use new browser instance to perform search
               try {
@@ -1016,7 +1018,7 @@ export async function multiGoogleSearch(
   logger.info(`[MultiSearch] Starting multiple searches for ${queries.length} queries...`);
   
   // Launch a single browser instance for all searches
-  const browser = await chromium.launch({
+  const browser = await chromium.launch(getChromiumLaunchOptions({
     headless: !options.debug,
     args: [
       "--disable-blink-features=AutomationControlled",
@@ -1046,7 +1048,7 @@ export async function multiGoogleSearch(
       "--metrics-recording-only",
     ],
     ignoreDefaultArgs: ["--enable-automation"],
-  });
+  }));
 
   try {
     // Create a unique state file for each query to avoid conflicts
@@ -1056,7 +1058,7 @@ export async function multiGoogleSearch(
           ...options,
           stateFile: options.stateFile 
             ? `${options.stateFile}-${index}`
-            : `./browser-state-${index}.json`,
+            : getStateFilePath(`browser-state-${index}.json`),
         };
         
         logger.info(`[MultiSearch] Starting search #${index + 1} for query: "${query}"`);
